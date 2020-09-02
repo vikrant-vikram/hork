@@ -1,8 +1,4 @@
 
-
-
-// organisation
-
 const mongoose = require("mongoose");
 
 var user= mongoose.Schema({
@@ -16,7 +12,7 @@ var user= mongoose.Schema({
         maxlength:10
     },
     password:{
-        String,
+        type:String,
         required:true,
         trim:true,
         minlength:7
@@ -31,7 +27,11 @@ var user= mongoose.Schema({
         type:mongoose.Schema.Types.ObjectId,
         ref:"class"
     },
-    flag:String
+    flag:{
+        type:String,
+        required:true,
+        trim:true
+    }
 });
 
 

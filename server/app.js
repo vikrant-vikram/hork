@@ -11,8 +11,6 @@ const Org = require("./models/organisation");
 const Solution = require("./models/solution");
 const Subject = require("./models/subjects");
 const User = require("./models/users");
-// const passport= require("passport");
-// const passportlocal=require("passport-local");
 var cookieParser = require('cookie-parser');
 var session = require('express-session');
 
@@ -42,7 +40,9 @@ DBSERVER="mongodb+srv://abhishek:abhishek@cluster0.b3zab.mongodb.net/hork?retryW
 mongoose.connect(DBSERVER, {useNewUrlParser: true,useUnifiedTopology: true});
 
 //-----------------ROUT-------------------
-
+//NOte:
+// I havent make any backend validation yet
+// all routs are defined in root
 
 
 
@@ -142,6 +142,17 @@ todo.post("/homework",isAny,function(req,res){
     })
 })
 
+todo.post("/class",isAdmin,function(req,res){
+    Class.find({organisation:req.session.user.organisation},function(err,data){
+        if(err){
+            res.send("ERROR:/CLASS")
+        }
+        else{
+            res.send(data)
+        }
+    })
+})
+
 todo.post("/submit/homework",isUser,function(req,res){
     //IMP NOTE: didnt handeled how to manage image files
     //so many changes required in this rout till now
@@ -169,6 +180,7 @@ todo.post("/register/organisation",isManager,function(req,res){
         info:req.body.info,
         flag:"TRUE"
     }
+    // console.log(org)
     Org.findOne({name:req.body.name},function(err,data){
         if(err){
             console.log(err)
@@ -191,6 +203,19 @@ todo.post("/register/organisation",isManager,function(req,res){
     })
 })
 
+
+todo.post("/organisation",isManager,function(req,res){
+    Org.find({},function(err,data){
+        if(err){
+            res.send("ERROR:/ORGANISATION")
+        }
+        else{
+            res.send(data)
+        }
+    })
+})
+
+
 todo.post("/register/orgadmin",isManager,function(req,res){
     let valid={
         contactno:req.body.contactno
@@ -202,7 +227,7 @@ todo.post("/register/orgadmin",isManager,function(req,res){
         }
         else if(data){
             console.log(data)
-            res.send("NAME ALREADY IN USE")
+            res.send("CONTACT ALREADY IN USE")
         }
         else{
             let orgadmin={
@@ -224,6 +249,18 @@ todo.post("/register/orgadmin",isManager,function(req,res){
         }
     })
 })
+
+todo.post("/orgadmin",isManager,function(req,res){
+    Orgadmin.find({},function(err,data){
+        if(err){
+            res.send("ERROR:/ORGANISATION")
+        }
+        else{
+            res.send(data)
+        }
+    })
+})
+
 
 todo.post("/login/orgadmin",function(req,res){
     let orgadmin={
@@ -250,7 +287,7 @@ todo.post("/login/orgadmin",function(req,res){
 todo.post("/create/class",isAdmin,function(req,res){
     let clss={
         name:req.body.name,
-        organisation:req.body.organisation,
+        organisation:req.session.user.organisation,
         created:req.session.user,
         flag:"TRUE",
     }
@@ -321,7 +358,7 @@ function isAdmin(req,res,next)
     {
         return next();
     }
-    res.render("ERROR:LOGIN");
+    res.send("ERROR:LOGIN");
 }
 
 function isUser(req,res,next)
