@@ -16,6 +16,7 @@ var session = require('express-session');
 
 todo=express();
 let fs = require('fs');
+const organisation = require("./models/organisation");
 // const homework = require("./models/homework");
 // const organisation = require("./models/organisation");
 // const { info } = require("console");
@@ -45,14 +46,15 @@ mongoose.connect(DBSERVER, {useNewUrlParser: true,useUnifiedTopology: true});
 // all routs are defined in root
 
 
-
+//working
 todo.post("/register/user",function( req,res) {
     let clss=req.body.class;
-    Class.findOne({id:clss},function(err,data){
+    Class.findOne({_id:clss},function(err,data){
         if(err){
-            
+            res.send("ERROR:/REGISTER/USER")
+            console.log(err)        
         }
-        else{
+        else if(data){
             User.findOne({contactno:req.body.contactno},function(err,found){
                 if(err){
                     res.send("Error in findone in register page")
@@ -62,10 +64,11 @@ todo.post("/register/user",function( req,res) {
                 }
                 else{
                     const user={
-                        username:req.body.username,
+                        name:req.body.name,
                         password:req.body.password,
                         contactno:req.body.contactno,
                         class:data,
+                        organisation:data.organisation,
                         flag:"False"
                     }
                     User.create(user,function(err,user){
@@ -75,17 +78,20 @@ todo.post("/register/user",function( req,res) {
                         }
                         else
                         {   console.log(user);
-                            res.render("successfully registered");
+                            res.send("successfully registered");
                         }
                     });
                 }
             })
         }
+        else{
+            res.send("Don't do it again.")
+        }
     })  
 });
 
 
-
+//working
 todo.post("/login/user",function( req,res) {
     var user=
     {
@@ -116,11 +122,24 @@ todo.post("/login/user",function( req,res) {
     });
 });
 
+//working
+todo.post("/user",isAdmin,function(req,res){
+    User.find({organisation:req.session.user.organisation},function(err,data){
+        if(err){
+            console.log(err)
+            res.send("ERROR:/USER")
+        }
+        else{
+            res.send(data)
+        }
+    })
+})
 
-todo.post("/subject",isAny,function(req,res){
+//working
+todo.post("/subject",isUser,function(req,res){
     // IMP NOTE: We need to find that user have access to the class 
-    let clss=req.body.class;
-    Subject.findAll({class:clss},function(err,data){
+    let clss=req.session.user.class;
+    Subject.find({class:clss},function(err,data){
         if(err){
             res.send("err in subject")
         }
@@ -130,9 +149,26 @@ todo.post("/subject",isAny,function(req,res){
     })
 })
 
+
+//working
+todo.post("/admin/subject",isAdmin,function(req,res){
+    // IMP NOTE: We need to find that user have access to the class 
+    let clss=req.body.class;
+    Subject.find({class:clss},function(err,data){
+        if(err){
+            res.send("err in subject")
+        }
+        else{
+            res.send(data)
+        }
+    })
+})
+
+
+//working
 todo.post("/homework",isAny,function(req,res){
     let subject = req.body.subject;
-    Homework.findAll({subject:subject},function(err,data){
+    Homework.find({subject:subject},function(err,data){
         if(err){
             res.send("err in subject")
         }
@@ -173,6 +209,7 @@ todo.post("/submit/homework",isUser,function(req,res){
     })
 })
 
+//working
 todo.post("/register/organisation",isManager,function(req,res){
     let org={
         name:req.body.name,
@@ -203,7 +240,7 @@ todo.post("/register/organisation",isManager,function(req,res){
     })
 })
 
-
+//working
 todo.post("/organisation",isManager,function(req,res){
     Org.find({},function(err,data){
         if(err){
@@ -215,7 +252,7 @@ todo.post("/organisation",isManager,function(req,res){
     })
 })
 
-
+//working
 todo.post("/register/orgadmin",isManager,function(req,res){
     let valid={
         contactno:req.body.contactno
@@ -250,6 +287,7 @@ todo.post("/register/orgadmin",isManager,function(req,res){
     })
 })
 
+//working
 todo.post("/orgadmin",isManager,function(req,res){
     Orgadmin.find({},function(err,data){
         if(err){
@@ -261,7 +299,7 @@ todo.post("/orgadmin",isManager,function(req,res){
     })
 })
 
-
+//working
 todo.post("/login/orgadmin",function(req,res){
     let orgadmin={
         contactno:req.body.contactno,
@@ -284,6 +322,7 @@ todo.post("/login/orgadmin",function(req,res){
 
 })
 
+//working
 todo.post("/create/class",isAdmin,function(req,res){
     let clss={
         name:req.body.name,
@@ -302,11 +341,12 @@ todo.post("/create/class",isAdmin,function(req,res){
     })
 })
 
+//working
 todo.post("/create/subject",isAdmin,function(req,res){
     let subject={
         name:req.body.name,
         class:req.body.class,
-        crated:req.session.user,
+        created:req.session.user,
         flag:"TRUE"
     }
     Subject.create(subject,function(err,data){
@@ -320,14 +360,15 @@ todo.post("/create/subject",isAdmin,function(req,res){
     })
 })
 
+//working
 todo.post("/create/homework",isAdmin,function(req,res){
     let homework=
     {
-        heading:req.body.homework,
+        heading:req.body.heading,
         details:req.body.details,
-        image:"",
+        image:"/images/",
         url:req.body.url,
-        marks:req.body.url,
+        marks:req.body.marks,
         type:req.body.type,
         flag:"TRUE",
         subject:req.body.subject
@@ -343,10 +384,9 @@ todo.post("/create/homework",isAdmin,function(req,res){
     })
 })
 
-
-
+//working
 todo.post("*", function (req, res) {
-    res.render("error 404");
+    res.send("error 404");
 });
 
 
@@ -363,7 +403,7 @@ function isAdmin(req,res,next)
 
 function isUser(req,res,next)
 {
-    if(req.session.userType=="User")
+    if(req.session.userType=="USER")
     {
         return next();
     }
@@ -372,11 +412,11 @@ function isUser(req,res,next)
 
 function isAny(req,res,next)
 {
-    if(req.session.userType=="ADMIN" || req.body.userType=="USER")
+    if(req.session.userType=="ADMIN" || req.session.userType=="USER")
     {
         return next();
     }
-    res.render("ERROR:LOGIN");
+    res.send("ERROR:LOGIN");
 }
 
 

@@ -23,9 +23,17 @@ var user= mongoose.Schema({
         required:true,
         trim:true
     },
-    groupid:{
+    class:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:"class"
+        ref:"class",
+        required:true,
+        trim:true
+    },
+    organisation:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"organisation",
+        required:true,
+        trim:true
     },
     flag:{
         type:String,
