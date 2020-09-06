@@ -178,6 +178,8 @@ todo.post("/homework",isAny,function(req,res){
     })
 })
 
+
+//working
 todo.post("/class",isAdmin,function(req,res){
     Class.find({organisation:req.session.user.organisation},function(err,data){
         if(err){
@@ -188,6 +190,8 @@ todo.post("/class",isAdmin,function(req,res){
         }
     })
 })
+
+
 
 todo.post("/submit/homework",isUser,function(req,res){
     //IMP NOTE: didnt handeled how to manage image files
