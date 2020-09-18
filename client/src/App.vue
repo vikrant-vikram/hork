@@ -1,24 +1,28 @@
 <template>
   <div id="app">
-    <div class="header">
-      <div class="rounded-circle">
-        logo
-      </div>
-    </div>
-
-
-
+        <nav class="navbar sticky-top shadow">
+        <a href="#" class="rounded-circle bg-primary">Hwk</a>
+    </nav>
     <router-view/>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'App'
+  name: 'App',
+   data () {
+    return {
+      type:0,
+      name:"",
+      class:"",
+
+    }
+  }
 }
 </script>
 
 <style>
+
 
 body{
 
@@ -38,5 +42,43 @@ body{
   margin-right: 0px;
 
 }
+ body{
+        background-color: #ffe2d1;
+        color: #55917f;
+
+    }
+    nav{
+        /* background-color: #ffe2d1; */
+        background-color: #55917f;
+        color: #ffe2d1;
+    }
+    input{
+        background-color: transparent;
+        border: none;
+        margin-top: 4vh;
+        color: #55917f;
+        border-bottom: #55917f thin solid;
+    }
+    .secondary{
+        background-color: #55917f;
+    }
+    .text-secondary{
+        background-color: #55917f;
+    }
+    .primary{
+        color: #ffe2d1;
+    }
+    .no-border{
+        border: none;
+    }
+    .bg-primary{
+        background-color: #ffe2d1;
+    }
+    .bg-white{
+        background-color: white;
+    }
+    .manage-top{
+        margin-top: 15vh;
+    }
 
 </style>
