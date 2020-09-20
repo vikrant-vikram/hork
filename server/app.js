@@ -2,6 +2,7 @@
 const express=require("express");
 const body= require("body-parser");
 const mongoose=require("mongoose");
+const cors= require("cors")
 const Attendence = require("./models/attendence");
 const Class = require("./models/class");
 const Homework = require("./models/homework");
@@ -35,8 +36,22 @@ todo.use(function(req,res,next){
     next();
 });
 
+var corsOptions = 
+{
+    origin: 'http://localhost:8080',
+    optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+}
+// app.use(cors(corsOptions));
+todo.use(cors())
+
+
+
+
+
 const port=process.env.PORT || 5555;
+todo.use(express.json())
 todo.use(body.urlencoded({extended:true}));
+
 DBSERVER="mongodb+srv://abhishek:abhishek@cluster0.b3zab.mongodb.net/hork?retryWrites=true&w=majority"
 mongoose.connect(DBSERVER, {useNewUrlParser: true,useUnifiedTopology: true});
 
@@ -104,7 +119,7 @@ todo.post("/login/user",function( req,res) {
         if(err)
         {
             console.log(err);
-            res.send("error occured in login");
+            res.json({"error":"ERROR"});
         }
         else if(user)
         {
@@ -112,12 +127,17 @@ todo.post("/login/user",function( req,res) {
             console.log(user);
             req.session.userType="USER";
             req.session.user=user;
-            res.send("successfully login")
+            res.json({
+                "login":true,
+                "user":user
+            })
         }
         else if(!user)
         {
             
-            res.send("wrong username or password");
+            res.json({
+                "login":false,
+            });
         }
     });
 });

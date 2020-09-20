@@ -13,8 +13,8 @@ export default {
    data () {
     return {
       type:0,
-      name:"",
-      class:"",
+      user:{},
+      url:"http://127.0.0.1:5555"
 
     }
   }
